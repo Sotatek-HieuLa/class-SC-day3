@@ -79,6 +79,8 @@ contract SotatekMarketPlace {
             })
         );
 
+        token.transferFrom(msg.sender, address(this), _tokenId);
+
         emit sell(_indexItem, _tokenId, _price);
     }
 
@@ -93,11 +95,7 @@ contract SotatekMarketPlace {
         _statusItem[_itemId] = false;
         _statusTokenSold[items[_itemId].tokenId] = false;
 
-        token.transferFrom(
-            token.ownerOf(items[_itemId].tokenId),
-            msg.sender,
-            items[_itemId].tokenId
-        );
+        token.transferFrom(address(this), msg.sender, items[_itemId].tokenId);
 
         items[_itemId].seller.transfer(items[_itemId].price);
     }

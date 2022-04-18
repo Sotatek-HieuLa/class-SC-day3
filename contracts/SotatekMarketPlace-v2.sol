@@ -81,6 +81,8 @@ contract SotatekMarketPlace2 is Ownable {
             })
         );
 
+        token.transferFrom(msg.sender, address(this), _tokenId);
+
         emit sell(_indexItem, _tokenId, _price);
     }
 
@@ -104,7 +106,7 @@ contract SotatekMarketPlace2 is Ownable {
         _statusTokenSold[items[_itemId].tokenId] = false;
 
         token.transferFrom(
-            token.ownerOf(items[_itemId].tokenId),
+            address(this),
             msg.sender,
             items[_itemId].tokenId
         );
