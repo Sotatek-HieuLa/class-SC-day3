@@ -36,12 +36,13 @@ describe("Market place version 1", function () {
     const items = await market.viewItem();
     expect(items[0].tokenId).to.equal(BigNumber.from("0"));
     expect(items.length).to.equal(1);
+    expect(await nft.ownerOf(items[0].tokenId)).to.equal(market.address);
   });
 
   it("Test sellItem with item are on sale", async function () {
     await expect(
       market.sellItem("0", ethers.utils.parseEther("1"))
-    ).to.be.revertedWith("This NFT token has been sold");
+    ).to.be.revertedWith("Sender does not own the item");
   });
 
   it("Test sellItem do not own", async function () {

@@ -1,12 +1,12 @@
 pragma solidity ^0.8.0;
 
 import "./interfaces/ISotatekNft.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract SotatekMarketPlace2 is Ownable {
+contract SotatekMarketPlace2 is Initializable {
     ISotatekNFT private token;
-    uint256 private _indexItem = 0;
-    address payable private _treasuryAddress = payable(address(0));
+    uint256 private _indexItem;
+    address private _ownerAddress;
 
     event sell(uint256 item, uint256 _tokenId, uint256 price);
     event buy(uint256 item);
@@ -24,8 +24,15 @@ contract SotatekMarketPlace2 is Ownable {
     mapping(uint256 => bool) private _statusItem;
     mapping(uint256 => bool) private _statusTokenSold;
 
-    constructor(address _nftAddress) {
+    address payable private _treasuryAddress;
+    function initialize(address _nftAddress, uint256 _initialIndex)
+        public
+        initializer
+    {
+        _ownerAddress = msg.sender;
         token = ISotatekNFT(_nftAddress);
+        _indexItem = _initialIndex;
+        _treasuryAddress = payable(address(0));
     }
 
     modifier CheckItemOwner(uint256 _itemId, bool _yesOrNo) {
@@ -105,11 +112,7 @@ contract SotatekMarketPlace2 is Ownable {
         _statusItem[_itemId] = false;
         _statusTokenSold[items[_itemId].tokenId] = false;
 
-        token.transferFrom(
-            address(this),
-            msg.sender,
-            items[_itemId].tokenId
-        );
+        token.transferFrom(address(this), msg.sender, items[_itemId].tokenId);
 
         items[_itemId].seller.transfer(payForSeller);
         _treasuryAddress.transfer(payForTreasury);
@@ -130,7 +133,8 @@ contract SotatekMarketPlace2 is Ownable {
         emit changePrice(_itemId, _oldPrice, _newPrice);
     }
 
-    function setTreasuryAddress(address _newTreasuryAddress) public onlyOwner {
+    function setTreasuryAddress(address _newTreasuryAddress) public {
+        require(_ownerAddress == msg.sender, "Ownable: caller is not the owner");
         address oldTreasuryAddress = _treasuryAddress;
         _treasuryAddress = payable(_newTreasuryAddress);
         emit changeTreasuryAddress(oldTreasuryAddress, _newTreasuryAddress);

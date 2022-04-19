@@ -1,11 +1,12 @@
 pragma solidity ^0.8.0;
 
 import "./interfaces/ISotatekNft.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract SotatekMarketPlace {
+contract SotatekMarketPlace  is Initializable {
     ISotatekNFT private token;
-
-    uint256 private _indexItem = 0;
+    uint256 private _indexItem;
+    address private _ownerAddress;
 
     event sell(uint256 item, uint256 _tokenId, uint256 price);
     event buy(uint256 item);
@@ -22,8 +23,9 @@ contract SotatekMarketPlace {
     mapping(uint256 => bool) private _statusItem;
     mapping(uint256 => bool) private _statusTokenSold;
 
-    constructor(address _nftAddress) {
+    function initialize(address _nftAddress, uint256 _initialIndex) public initializer{
         token = ISotatekNFT(_nftAddress);
+        _indexItem = _initialIndex;
     }
 
     modifier CheckItemOwner(uint256 _itemId, bool _yesOrNo) {
