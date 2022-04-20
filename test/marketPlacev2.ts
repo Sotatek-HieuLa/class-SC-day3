@@ -20,8 +20,10 @@ describe("Market place version 2", function () {
     nft.deployed();
 
     Market = await ethers.getContractFactory("SotatekMarketPlace2");
-    market = await Market.deploy(nft.address);
+    market = await Market.deploy();
     market.deployed();
+
+    market.initialize(nft.address, BigNumber.from("0"));
 
     nft.setMarketplace(market.address);
 
