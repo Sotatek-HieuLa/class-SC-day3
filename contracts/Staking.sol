@@ -80,10 +80,9 @@ contract SotatekStaking is Ownable {
 
     function _stake(uint256 tokenId, address tokenOwner) private {
         require(
-            _NFTToken.ownerOf(_tokenId) == tokenOwner,
+            _NFTToken.ownerOf(tokenId) == tokenOwner,
             "You must be the owner of the nft token to perform this action"
         );
-        _NFTToken.approve(address(this), tokenId);
         _NFTToken.transferFrom(tokenOwner, address(this), tokenId);
 
         _stakingRewards[tokenOwner].push(
